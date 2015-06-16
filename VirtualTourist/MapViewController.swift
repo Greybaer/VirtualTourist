@@ -8,6 +8,7 @@
 
 import UIKit
 import MapKit
+import CoreData
 
 class MapViewController: UIViewController, MKMapViewDelegate {
 
@@ -17,12 +18,39 @@ class MapViewController: UIViewController, MKMapViewDelegate {
     
     
     //variables
-    
+    //Shorthand for the CoreData context
+    var sharedContext: NSManagedObjectContext {
+        return CoreDataStackManager.sharedInstance().managedObjectContext!
+    }
+    //Annotation array
+    var annotations = [Pin]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         //we're our own map delegate
         mapView.delegate = self
+        
+        //If we have persisted annotation coords load em.
+        //TODO: Make this a convenience function once it works
+        let error: NSErrorPointer = nil
+        let fetchRequest = NSFetchRequest(entityName: "Pin")
+        //If there are results create pins. If not move on
+        if let results = sharedContext.executeFetchRequest(fetchRequest, error: error){
+            if error != nil{
+                //puke up an error for now
+                //TODO: Nice alertview
+                println("Error retrieving annotations!")
+            }else{
+                annotations = results as! [Pin]
+                for p in annotations{
+                    var pinAnnotation = MKPointAnnotation()
+                    pinAnnotation.coordinate.latitude = p.latitude as Double
+                    pinAnnotation.coordinate.longitude = p.longitude as Double
+                    self.mapView.addAnnotation(pinAnnotation)
+                }//for loop
+            }//if/else
+        }//fetchRequest
+        
     }
 
     //***************************************************
@@ -39,13 +67,30 @@ class MapViewController: UIViewController, MKMapViewDelegate {
         
         //Respond once the hold has ended
         if longpress.state == UIGestureRecognizerState.Ended{
-            println("Tap/Hold end recognized")
+            //println("Tap/Hold end recognized")
             //Get the tap location
             var touchPoint = longpress.locationOfTouch(0, inView: mapView)
             //Get the coordinates of the touch
             coordinates = mapView.convertPoint(touchPoint, toCoordinateFromView: self.mapView)
+            //This method avoids swapping the coords!
             annotation.coordinate = coordinates
             self.mapView.addAnnotation(annotation)
+            
+            //Now save the annotation coordinate to the Pin array
+            //Maybe we'll need to check to see if an exact duplicate pin already exists? Later!
+            
+            //Create a new Pin dictionary
+            let dictionary: [String : AnyObject] = [
+                Pin.Keys.Latitude : coordinates.latitude,
+                Pin.Keys.Longitude : coordinates.longitude
+            ]//dictionary
+            
+            //...and use it to create a new Pin object
+            let newPin = Pin(dictionary: dictionary, context: sharedContext)
+            //Add it to the array here as well
+            self.annotations.append(newPin)
+            //Save to the context
+            CoreDataStackManager.sharedInstance().saveContext()
         }//longpress
     }//tapHold
 
