@@ -31,6 +31,7 @@ class MapViewController: UIViewController, MKMapViewDelegate {
         //we're our own map delegate
         mapView.delegate = self
         
+        /*
         //If we have persisted annotation coords load em.
         //TODO: Make this a convenience function once it works
         let error: NSErrorPointer = nil
@@ -54,7 +55,20 @@ class MapViewController: UIViewController, MKMapViewDelegate {
                 }//for loop
             }//if/else
         }//fetchRequest
+*/
         
+    }//viewDidLoad
+    
+    override func viewWillAppear(animated: Bool) {
+        //Hide the nav bar
+        self.navigationController?.navigationBarHidden = true
+        
+    }//viewWillAppear
+    
+    override func viewWillDisappear(animated: Bool) {
+        //Re-show the nav bar before disappearing. Failing to do so makes the back button invisible!
+        self.navigationController?.navigationBarHidden = false
+
     }
 
     //***************************************************
@@ -121,7 +135,25 @@ class MapViewController: UIViewController, MKMapViewDelegate {
         }
         
         return pinView
-    }
+    }//viewForAnnotation
+    
+    //***************************************************
+    // User tapped an annotation
+    func mapView(mapView: MKMapView!, didSelectAnnotationView view: MKAnnotationView!) {
+        
+        //unselect the pin so we can re-select it later if desired
+        mapView.deselectAnnotation(view.annotation, animated: true)
+        
+        //Segue to Collection View
+        //grab the reference
+        let controller = self.storyboard!.instantiateViewControllerWithIdentifier("CollectionViewController") as! CollectionViewController
+        //and pass the selected annotation for display on the collection view maplet
+        controller.photoAnnotation = view.annotation
+        //and show it
+        self.navigationController?.pushViewController(controller,animated: true)
+        
+    }//didSelectAnnotation
+
 
 }
 

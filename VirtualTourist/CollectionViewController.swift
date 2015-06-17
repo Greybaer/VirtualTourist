@@ -12,9 +12,9 @@ import MapKit
 class CollectionViewController: UIViewController, UICollectionViewDataSource, MKMapViewDelegate {
 
     //Outlets
+    @IBOutlet weak var newCollectionButton: UIBarButtonItem!
     @IBOutlet weak var staticMap: MKMapView!
     @IBOutlet weak var photoCollection: UICollectionView!
-    @IBOutlet weak var newCollectionButton: UIBarButtonItem!
     
     //Variables
     //This gets passed in by the segue
