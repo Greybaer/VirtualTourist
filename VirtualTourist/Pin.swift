@@ -37,5 +37,6 @@ class Pin : NSManagedObject {
         //Now init our properties from the dictionary
         latitude = dictionary[Keys.Latitude] as! Double
         longitude = dictionary[Keys.Longitude] as! Double
+        println("Saved: Lat \(latitude): Long \(longitude)")
     }//init
 }//Pin

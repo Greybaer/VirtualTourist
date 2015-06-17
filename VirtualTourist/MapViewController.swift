@@ -22,6 +22,7 @@ class MapViewController: UIViewController, MKMapViewDelegate {
     var sharedContext: NSManagedObjectContext {
         return CoreDataStackManager.sharedInstance().managedObjectContext!
     }
+    
     //Annotation array
     var annotations = [Pin]()
     
@@ -42,12 +43,16 @@ class MapViewController: UIViewController, MKMapViewDelegate {
                 println("Error retrieving annotations!")
             }else{
                 annotations = results as! [Pin]
-                for p in annotations{
+                println("Annotations retrieved: \(annotations.count)")
+                println(annotations)
+                println(annotations[0].valueForKey("latitude") as! Double)
+                /*for p in annotations{
                     var pinAnnotation = MKPointAnnotation()
                     pinAnnotation.coordinate.latitude = p.latitude as Double
                     pinAnnotation.coordinate.longitude = p.longitude as Double
                     self.mapView.addAnnotation(pinAnnotation)
                 }//for loop
+                */
             }//if/else
         }//fetchRequest
         
@@ -81,8 +86,8 @@ class MapViewController: UIViewController, MKMapViewDelegate {
             
             //Create a new Pin dictionary
             let dictionary: [String : AnyObject] = [
-                Pin.Keys.Latitude : coordinates.latitude,
-                Pin.Keys.Longitude : coordinates.longitude
+                Pin.Keys.Latitude : coordinates.latitude as Double,
+                Pin.Keys.Longitude : coordinates.longitude as Double
             ]//dictionary
             
             //...and use it to create a new Pin object

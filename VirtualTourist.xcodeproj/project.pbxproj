@@ -16,6 +16,11 @@
 		A83EA28A1B309C27006E8822 /* CoreDataStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = A83EA2891B309C27006E8822 /* CoreDataStack.swift */; };
 		A83EA28D1B309D66006E8822 /* VirtualTourist.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = A83EA28B1B309D66006E8822 /* VirtualTourist.xcdatamodeld */; };
 		A83EA28F1B309E08006E8822 /* Pin.swift in Sources */ = {isa = PBXBuildFile; fileRef = A83EA28E1B309E08006E8822 /* Pin.swift */; };
+		A8D752601B31C14C00229A52 /* CollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8D752581B31C14C00229A52 /* CollectionViewCell.swift */; };
+		A8D752611B31C14C00229A52 /* CollectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8D752591B31C14C00229A52 /* CollectionViewController.swift */; };
+		A8D752641B31C14C00229A52 /* Photo.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8D7525C1B31C14C00229A52 /* Photo.swift */; };
+		A8D752661B31C14C00229A52 /* VTClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8D7525E1B31C14C00229A52 /* VTClient.swift */; };
+		A8D752671B31C14C00229A52 /* VTConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8D7525F1B31C14C00229A52 /* VTConstants.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -42,6 +47,11 @@
 		A83EA2891B309C27006E8822 /* CoreDataStack.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreDataStack.swift; sourceTree = "<group>"; };
 		A83EA28C1B309D66006E8822 /* VirtualTourist.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = VirtualTourist.xcdatamodel; sourceTree = "<group>"; };
 		A83EA28E1B309E08006E8822 /* Pin.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Pin.swift; sourceTree = "<group>"; };
+		A8D752581B31C14C00229A52 /* CollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CollectionViewCell.swift; sourceTree = "<group>"; };
+		A8D752591B31C14C00229A52 /* CollectionViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CollectionViewController.swift; sourceTree = "<group>"; };
+		A8D7525C1B31C14C00229A52 /* Photo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Photo.swift; sourceTree = "<group>"; };
+		A8D7525E1B31C14C00229A52 /* VTClient.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VTClient.swift; sourceTree = "<group>"; };
+		A8D7525F1B31C14C00229A52 /* VTConstants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VTConstants.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -86,6 +96,11 @@
 				A83EA2691B306E1F006E8822 /* AppDelegate.swift */,
 				A83EA2891B309C27006E8822 /* CoreDataStack.swift */,
 				A83EA26B1B306E1F006E8822 /* MapViewController.swift */,
+				A8D752581B31C14C00229A52 /* CollectionViewCell.swift */,
+				A8D752591B31C14C00229A52 /* CollectionViewController.swift */,
+				A8D7525C1B31C14C00229A52 /* Photo.swift */,
+				A8D7525E1B31C14C00229A52 /* VTClient.swift */,
+				A8D7525F1B31C14C00229A52 /* VTConstants.swift */,
 				A83EA28B1B309D66006E8822 /* VirtualTourist.xcdatamodeld */,
 				A83EA28E1B309E08006E8822 /* Pin.swift */,
 				A83EA26D1B306E1F006E8822 /* Main.storyboard */,
@@ -221,9 +236,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A8D752641B31C14C00229A52 /* Photo.swift in Sources */,
+				A8D752671B31C14C00229A52 /* VTConstants.swift in Sources */,
 				A83EA28F1B309E08006E8822 /* Pin.swift in Sources */,
 				A83EA28A1B309C27006E8822 /* CoreDataStack.swift in Sources */,
+				A8D752601B31C14C00229A52 /* CollectionViewCell.swift in Sources */,
 				A83EA26C1B306E1F006E8822 /* MapViewController.swift in Sources */,
+				A8D752611B31C14C00229A52 /* CollectionViewController.swift in Sources */,
+				A8D752661B31C14C00229A52 /* VTClient.swift in Sources */,
 				A83EA26A1B306E1F006E8822 /* AppDelegate.swift in Sources */,
 				A83EA28D1B309D66006E8822 /* VirtualTourist.xcdatamodeld in Sources */,
 			);
@@ -421,6 +441,7 @@
 				A83EA2851B306E1F006E8822 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		A83EA2861B306E1F006E8822 /* Build configuration list for PBXNativeTarget "VirtualTouristTests" */ = {
 			isa = XCConfigurationList;
@@ -429,6 +450,7 @@
 				A83EA2881B306E1F006E8822 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 
