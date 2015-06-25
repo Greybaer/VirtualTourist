@@ -9,20 +9,22 @@
 import UIKit
 import CoreData
 
-@objc(Photo)
+//@objc(Photo)
 
 class Photo : NSManagedObject{
     
     struct Keys {
-        static let Url = "url"
+        static let Id = "id"
+        static let Url = "url_m"
     }
     
+    @NSManaged var id: String
     @NSManaged var url: String
-    @NSManaged var location: Pin?
+    @NSManaged var location: Pin
     
     override init(entity: NSEntityDescription, insertIntoManagedObjectContext context: NSManagedObjectContext?) {
         super.init(entity: entity, insertIntoManagedObjectContext: context)
-    }
+    }//override
 
     init(dictionary: [String : AnyObject], context: NSManagedObjectContext) {
     
@@ -31,10 +33,18 @@ class Photo : NSManagedObject{
         super.init(entity: entity, insertIntoManagedObjectContext: context)
         
         //Dictionary
+        id = dictionary[Keys.Id] as! String
         url = dictionary[Keys.Url] as! String
+    }//init
+    
+    var image: UIImage? {
+        get {
+            return VTClient.Cache.imageCache.imageWithIdentifier(id)
+        }
+        set {
+            VTClient.Cache.imageCache.storeImage(newValue, withIdentifier: id)
+        }
     }
+
 }//class
 
-
-//TODO: create an image function ala FavoriteActors to stor the images.String
-//This should speed up display of previously accessed collections

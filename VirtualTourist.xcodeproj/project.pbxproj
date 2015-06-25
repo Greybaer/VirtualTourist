@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A801F1071B385A0400D04DE7 /* ImageCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = A801F1061B385A0400D04DE7 /* ImageCache.swift */; };
 		A83EA26A1B306E1F006E8822 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A83EA2691B306E1F006E8822 /* AppDelegate.swift */; };
 		A83EA26C1B306E1F006E8822 /* MapViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A83EA26B1B306E1F006E8822 /* MapViewController.swift */; };
 		A83EA26F1B306E1F006E8822 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A83EA26D1B306E1F006E8822 /* Main.storyboard */; };
@@ -34,6 +35,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		A801F1061B385A0400D04DE7 /* ImageCache.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageCache.swift; sourceTree = "<group>"; };
 		A83EA2641B306E1F006E8822 /* VirtualTourist.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = VirtualTourist.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A83EA2681B306E1F006E8822 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A83EA2691B306E1F006E8822 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -99,10 +101,11 @@
 				A8D752581B31C14C00229A52 /* CollectionViewCell.swift */,
 				A8D752591B31C14C00229A52 /* CollectionViewController.swift */,
 				A8D7525C1B31C14C00229A52 /* Photo.swift */,
+				A83EA28E1B309E08006E8822 /* Pin.swift */,
 				A8D7525E1B31C14C00229A52 /* VTClient.swift */,
+				A801F1061B385A0400D04DE7 /* ImageCache.swift */,
 				A8D7525F1B31C14C00229A52 /* VTConstants.swift */,
 				A83EA28B1B309D66006E8822 /* VirtualTourist.xcdatamodeld */,
-				A83EA28E1B309E08006E8822 /* Pin.swift */,
 				A83EA26D1B306E1F006E8822 /* Main.storyboard */,
 				A83EA2701B306E1F006E8822 /* Images.xcassets */,
 				A83EA2721B306E1F006E8822 /* LaunchScreen.xib */,
@@ -236,6 +239,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A801F1071B385A0400D04DE7 /* ImageCache.swift in Sources */,
 				A8D752641B31C14C00229A52 /* Photo.swift in Sources */,
 				A8D752671B31C14C00229A52 /* VTConstants.swift in Sources */,
 				A83EA28F1B309E08006E8822 /* Pin.swift in Sources */,

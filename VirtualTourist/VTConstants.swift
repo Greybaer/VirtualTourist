@@ -21,5 +21,5 @@ extension VTClient{
         static let PER_PAGE = 21    //3 rows across, 7 down. Always filling!
         static let ACCURACY = 6     //Results should be pertinent to the city wide location or better
     }//Constants
-
+    
 }//extension

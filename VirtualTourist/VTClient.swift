@@ -9,29 +9,36 @@
 
 import Foundation
 import UIKit
+import MapKit
+import CoreData
 import CoreLocation
 
 class VTClient: NSObject {
-    //***************************************************
+
     //Variables
-    //***************************************************
 
     //The URL Session
     var session: NSURLSession
+    
     //temporary photo array for testing collection view
     var photoList = [String]()
+    
+    //Shorthand for the CoreData context
+    var sharedContext: NSManagedObjectContext {
+        return CoreDataStackManager.sharedInstance().managedObjectContext!
+    }
 
     //***************************************************
     //Create a shared session for the NSURLSession calls
-    //***************************************************
     override init() {
         session = NSURLSession.sharedSession()
         super.init()
     }//init
 
     //***************************************************
-    // Shared Instance
-    //***************************************************
+    // Shared Object Methods
+    
+    //Shared Instance
     class func sharedInstance() -> VTClient {
     
         struct Singleton {
@@ -40,10 +47,19 @@ class VTClient: NSObject {
     
         return Singleton.sharedInstance
     }//sharedInstance
+    
+    //Shared Image Cache
+    struct Cache {
+        static let imageCache = ImageCache()
+    }
+    
     //***************************************************
     // Network Functions
     //***************************************************
-    func getFlickrData(coords: CLLocationCoordinate2D, completionhandler: (success: Bool, error: String?) -> Void){
+ 
+    //***************************************************
+    // GetFlickrData - Pull photos based on pin selection
+    func getFlickrData(pin: Pin, completionhandler: (success: Bool, error: String?) -> Void){
         //The arguments we need to create a Flickr request
         let methodArguments = [
             "method": Constants.METHOD_NAME,
@@ -53,9 +69,9 @@ class VTClient: NSObject {
             "nojsoncallback": Constants.NO_JSON_CALLBACK,
             "per_page": Constants.PER_PAGE,
             "accuracy": Constants.ACCURACY,
-            "lat": coords.latitude,
-            "lon": coords.longitude,
-            "page": 1   //TODO: Change this to accept passed argument for which page to grab
+            "lat": pin.latitude as Double,
+            "lon": pin.longitude as Double,
+            "page": pin.page + 1   
         ]
         
         //Build a request string and a session
@@ -88,10 +104,23 @@ class VTClient: NSObject {
                         if let photoArray = dictionary["photo"] as? [[String:AnyObject]]{
                             //println(photoArray)
                             //loop through each entry, grab the url and append it to photo list array (for now)
-                            for photo in photoArray{
+                            for photog in photoArray{
                                 //Make sure there is a valid string there
-                                if let url = photo["url_m"] as? String{
+                                if let url = photog["url_m"] as? String{
+                                    //This will get removed once the photo objects are working
                                     self.photoList.append(url)
+                                    //create a dictionary
+                                    let dictionary: [String : AnyObject] = [
+                                        Photo.Keys.Url : photog["url_m"] as! String,
+                                        Photo.Keys.Id : photog["id"] as! String
+                                    ]
+                                    //and init a new Photo object with the data
+                                    let photo = Photo(dictionary: dictionary, context: self.sharedContext)
+                                    //Set the location info for the photo, which should populate the phots array in Pin?
+                                    photo.location = pin
+                                    dispatch_async(dispatch_get_main_queue()) {
+                                        CoreDataStackManager.sharedInstance().saveContext()
+                                    }
                                 }else{
                                     //skip it
                                     continue
@@ -100,12 +129,10 @@ class VTClient: NSObject {
                             }
                             //return success
                             println("Leaving getFlickrData")
-                            //fake a bad URL to test placeholder placement
-                            //self.photoList[6] = ""
-                            completionhandler(success: true, error: nil)
+                           completionhandler(success: true, error: nil)
                         }//photoArray
                         else{
-                            completionhandler(success: false, error: "Photo Count is Zero")
+                            completionhandler(success: false, error: "No Photos Found")
                         }//photo retrieval failure
                     }//photoCount
                 }//dictionary
@@ -115,6 +142,30 @@ class VTClient: NSObject {
     }//getFlickrData
     
     //***************************************************
+    // Get an image from the URL
+    func taskForImage(filePath:String, completionHandler :(imageDate:NSData?, error:NSError?) -> Void)-> NSURLSessionTask {
+        
+        //Create the request
+        let url = NSURL(string: filePath)!
+        let request = NSURLRequest(URL: url)
+        
+        // Make the request
+        let task = session.dataTaskWithRequest(request) {
+            data, response, downloadError in
+            
+            if let error = downloadError {
+                 completionHandler(imageDate: data, error: error)
+            } else {
+                completionHandler(imageDate: data, error: nil)
+            }
+        }
+        task.resume()
+        return task
+        
+    }
+
+    
+    //***************************************************
     // Helper Functions
     //***************************************************
 
@@ -122,7 +173,6 @@ class VTClient: NSObject {
     // Given a dictionary of parameters,
     // convert to a string for a url
     // GB - Lifted from the original class app example
-    //***************************************************
     func escapedParameters(parameters: [String : AnyObject]) -> String {
     
         var urlVars = [String]()
@@ -147,13 +197,28 @@ class VTClient: NSObject {
     
     //***************************************************
     // Create an AlertView to display an error message
-    //***************************************************
     func errorDialog(viewController:UIViewController, errTitle: String, action: String, errMsg:String) -> Void{
         let alertController = UIAlertController(title: errTitle, message: errMsg, preferredStyle: UIAlertControllerStyle.Alert)
         let alertAction = UIAlertAction(title: action, style: UIAlertActionStyle.Default, handler: nil)
         alertController.addAction(alertAction)
         viewController.presentViewController(alertController, animated: true, completion: nil)
     }
+    
+    //***************************************************
+    // Get a pin object based on a set of coordinates
+    func getMapLocationFromAnnotation(annotation:MKAnnotation, pins: [Pin]!) -> Pin? {
+        
+        // Fetch exact map location from annotation view
+        let filteredPins =   pins.filter {
+            $0.latitude == annotation.coordinate.latitude &&
+                $0.longitude == annotation.coordinate.longitude
+        }
+        if filteredPins.count > 0 {
+            return filteredPins.last!
+        }
+        return nil
+    }
+
 
     
 }//VTClient
