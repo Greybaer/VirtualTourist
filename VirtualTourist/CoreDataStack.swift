@@ -71,8 +71,6 @@ class CoreDataStackManager{
             dict[NSLocalizedFailureReasonErrorKey] = failureReason
             dict[NSUnderlyingErrorKey] = error
             error = NSError(domain: "YOUR_ERROR_DOMAIN", code: 9999, userInfo: dict)
-            // NOTE: a graceful alertview here would be nice.
-            
             // abort() causes the application to generate a crash log and terminate. 
             // Retained for development - REMOVE FOR SHIPPING APPS!!!
             NSLog("Unresolved error \(error), \(error!.userInfo)")

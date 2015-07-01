@@ -24,6 +24,7 @@ class MapViewController: UIViewController, MKMapViewDelegate {
     //Outlets
     @IBOutlet weak var mapView: MKMapView!
     @IBOutlet var longpress: UILongPressGestureRecognizer!
+    @IBOutlet weak var editPinButton: UIBarButtonItem!
     
     
     //variables
@@ -51,6 +52,10 @@ class MapViewController: UIViewController, MKMapViewDelegate {
     //Annotation array
     var annotations = [Pin]()
     
+    //Boolean value for pin add/delete
+    var deletePins = false
+    
+    //Class methods
     override func viewDidLoad() {
         super.viewDidLoad()
         //we're our own map delegate
@@ -63,17 +68,6 @@ class MapViewController: UIViewController, MKMapViewDelegate {
         //println("Loaded Pins")
     }//viewDidLoad
     
-    override func viewWillAppear(animated: Bool) {
-        //Hide the nav bar
-        self.navigationController?.navigationBarHidden = true
-        
-    }//viewWillAppear
-    
-    override func viewWillDisappear(animated: Bool) {
-        //Re-show the nav bar before disappearing. Failing to do so makes the back button invisible!
-        self.navigationController?.navigationBarHidden = false
-
-    }
     
     //***************************************************
     // Save the mapRegion with NSKeyedArchiver
@@ -117,11 +111,13 @@ class MapViewController: UIViewController, MKMapViewDelegate {
         var annotation = MKPointAnnotation()
         //and a coordinate object
         var coordinates: CLLocationCoordinate2D!
-        //new page please
-        var pageNumber = 0
-        
+       
         //Respond once the hold has ended
         if longpress.state == UIGestureRecognizerState.Ended{
+            //If the user taps and hold let's automagically disable pin removal if it's onto
+            if deletePins{
+                editPins(self)
+            }
             //println("Tap/Hold end recognized")
             //Get the tap location
             var touchPoint = longpress.locationOfTouch(0, inView: mapView)
@@ -138,7 +134,8 @@ class MapViewController: UIViewController, MKMapViewDelegate {
             let dictionary: [String : AnyObject] = [
                 Pin.Keys.Latitude : coordinates.latitude as Double,
                 Pin.Keys.Longitude : coordinates.longitude as Double,
-                Pin.Keys.Page : pageNumber    //new pin means by definition we've never loaded any photos
+                Pin.Keys.Page : 1,    //new pin means by definition we've never loaded any photos
+                Pin.Keys.LastPage : 1//ditto for the number of pages
             ]//dictionary
             
            
@@ -148,8 +145,28 @@ class MapViewController: UIViewController, MKMapViewDelegate {
             self.annotations.append(newPin)
             //Save to the context
             CoreDataStackManager.sharedInstance().saveContext()
+            //Enable the edit pin button
+            editPinButton.enabled = true
         }//longpress
     }//tapHold
+    
+    //***************************************************
+    // editPins - User wants to remove a pin or pins
+    // we just use a boolean toggle to signal removal
+    @IBAction func editPins(sender: AnyObject) {
+        switch deletePins {
+        case true:
+            deletePins = false
+            editPinButton.title = "Edit"
+        case false:
+            deletePins = true
+            editPinButton.title = "Done"
+        default:
+            deletePins = false
+            editPinButton.title = "Edit"
+        }
+    }
+    
 
     //***************************************************
     // Delegate Methods
@@ -174,7 +191,8 @@ class MapViewController: UIViewController, MKMapViewDelegate {
         if pinView == nil {
             pinView = MKPinAnnotationView(annotation: annotation, reuseIdentifier: reuseId)
             pinView!.canShowCallout = false
-            pinView!.pinColor = .Red
+            pinView?.animatesDrop = true
+            pinView!.pinColor = .Green
        }
         else {
             pinView!.annotation = annotation
@@ -186,22 +204,35 @@ class MapViewController: UIViewController, MKMapViewDelegate {
     //***************************************************
     // User tapped an annotation
     func mapView(mapView: MKMapView!, didSelectAnnotationView view: MKAnnotationView!) {
+        if deletePins == true{
+            //find the pin
+            var pinToDelete = VTClient.sharedInstance().getMapLocationFromAnnotation(view.annotation, pins: annotations)
+            //remove the pin
+            sharedContext.deleteObject(pinToDelete!)
+            //save the context
+            CoreDataStackManager.sharedInstance().saveContext()
+            //Remove the pin from the annotations array
+            removePinFromAnnotations(pinToDelete!)
+            //delete the annotation from the map
+            mapView.removeAnnotation(view.annotation)
+            if annotations.count < 1{
+                //Can't very well edit if there are no pins, can we?
+                editPins(self)
+                editPinButton.enabled = false
+            }
+        }else{
+            //unselect the pin so we can re-select it later if desired
+            mapView.deselectAnnotation(view.annotation, animated: true)
         
-        //unselect the pin so we can re-select it later if desired
-        mapView.deselectAnnotation(view.annotation, animated: true)
-        
-        
-        //Segue to Collection View
-        //grab the reference
-        let controller = self.storyboard!.instantiateViewControllerWithIdentifier("CollectionViewController") as! CollectionViewController
-        //and pass the selected annotation for display on the collection view maplet
-        //TODO: Remove this and use the pin we pass!
-        //controller.photoAnnotation = view.annotation
-        controller.annotation = VTClient.sharedInstance().getMapLocationFromAnnotation(view.annotation, pins: annotations)
+            //Segue to Collection View
+            //grab the reference
+            let controller = self.storyboard!.instantiateViewControllerWithIdentifier("CollectionViewController") as! CollectionViewController
+            //and pass the selected annotation for display on the collection view maplet
+            controller.annotation = VTClient.sharedInstance().getMapLocationFromAnnotation(view.annotation, pins: annotations)
 
-        //and show it
-        self.navigationController?.pushViewController(controller,animated: true)
-        
+            //and show it
+            self.navigationController?.pushViewController(controller,animated: true)
+        }
     }//didSelectAnnotation
 
     //***************************************************
@@ -211,6 +242,9 @@ class MapViewController: UIViewController, MKMapViewDelegate {
     //***************************************************
     // loadPins - Load pin data from CoreData and display them
     func loadPins(){
+        //Default the Edit button to disabled
+        editPinButton.enabled = false
+        
         //error object if fetch fails
         let error: NSErrorPointer = nil
         //build the fetchRequest
@@ -218,12 +252,10 @@ class MapViewController: UIViewController, MKMapViewDelegate {
         //If there are results create pins. If not move on
         if let results = sharedContext.executeFetchRequest(fetchRequest, error: error) {
             if error != nil{
-                //puke up an error for now
-                //TODO: Nice alertview
-                println("Error retrieving annotations!")
+               //Nice alertview
+                VTClient.sharedInstance().errorDialog(self, errTitle: "Pin Load Error", action: "OK", errMsg: "Error loading pin locations from disk")
             }else{
-                //Kludge alert! - I deal with the data without casting because I get data errors when trying to work with [Pin] objects
-                //println("Annotations retrieved: \(results!.count)")
+               //println("Annotations retrieved: \(results!.count)")
                 //So, we iterate through the results and pull out the coordinates...
                 annotations = results as! [Pin]
                 if annotations.count > 0{
@@ -234,12 +266,23 @@ class MapViewController: UIViewController, MKMapViewDelegate {
                         pinAnnotation.coordinate = CLLocationCoordinate2D(latitude: p.latitude, longitude: p.longitude)
                         //and display it on the map
                         self.mapView.addAnnotation(pinAnnotation)
-                    }
-                }//for loop
+                    }//for loop
+                    //We found pins, so enable the edit button
+                    editPinButton.enabled = true
+                }//if/else
             }//if/else
         }//fetchRequest
     }//loadPins
     
+    func removePinFromAnnotations(pin: Pin){
+        //filter the array and return an array without matching element
+        let ann_array = annotations.filter{
+            $0.latitude != pin.latitude &&
+            $0.longitude != pin.longitude
+        }
+        //Save the new array minus the match
+        annotations = ann_array
+    }//removePins
 
 }
 

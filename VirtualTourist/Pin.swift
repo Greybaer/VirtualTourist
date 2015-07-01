@@ -17,6 +17,7 @@ class Pin : NSManagedObject {
         static let Longitude = "longitude"
         static let Photos = "photos"
         static let Page = "page"
+        static let LastPage = "lastPage"
     }//Keys
     
     //Promote the variables to Core Data attributes
@@ -24,6 +25,7 @@ class Pin : NSManagedObject {
     @NSManaged var longitude: Double
     @NSManaged var photos: [Photo]
     @NSManaged var page: Int
+    @NSManaged var lastPage: Int
     
     //Standard Core Data init method
     override init(entity: NSEntityDescription, insertIntoManagedObjectContext context: NSManagedObjectContext?) {
@@ -44,6 +46,7 @@ class Pin : NSManagedObject {
         latitude = dictionary[Keys.Latitude] as! Double
         longitude = dictionary[Keys.Longitude]as! Double
         page = dictionary[Keys.Page] as! Int
+        lastPage = dictionary[Keys.LastPage] as! Int
         //println("Saved: Lat \(latitude): Long \(longitude)")
         //println("dlat: \(dlat)")
     }//init

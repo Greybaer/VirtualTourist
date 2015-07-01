@@ -71,8 +71,9 @@ class VTClient: NSObject {
             "accuracy": Constants.ACCURACY,
             "lat": pin.latitude as Double,
             "lon": pin.longitude as Double,
-            "page": pin.page + 1   
+            "page": pin.page as Int
         ]
+        
         
         //Build a request string and a session
         let session = NSURLSession.sharedSession()
@@ -80,6 +81,9 @@ class VTClient: NSObject {
         let url = NSURL(string: urlString)!
         let request = NSURLRequest(URL: url)
         //println(request)
+        
+        //println("Pin values entering FlickrData: \(pin.latitude)|\(pin.longitude)|\(pin.page)|\(pin.lastPage)")
+        //println("Downloading from page \(pin.page) in GetFlickrData()")
         
         //See what we get back
         let task = session.dataTaskWithRequest(request) {data, response, downloadError in
@@ -94,8 +98,18 @@ class VTClient: NSObject {
                 //println("Parsed result: \(parsedResult)")
                 //Create a dictionary from the results with Key:Value pairs
                 if let dictionary = parsedResult.valueForKey("photos") as? [String:AnyObject]{
-                    //Check to see that we actually got photos to show
+                    //Save the total number of pages so we can use that when loading new collections
+                    var pages = dictionary["pages"] as! Int
+                    //Drop the value into the pin object
+                    //println("Pin values in FlickrData: \(pin.latitude)|\(pin.longitude)|\(pin.page)|\(pin.lastPage)")
+                    pin.lastPage = pages
+                    //and save the context
+                    dispatch_async(dispatch_get_main_queue()) {
+                        CoreDataStackManager.sharedInstance().saveContext()
+                    }
+                    //println("Total pages: \(pages)")
                     var photoCount = 0
+                    //Check to see that we actually got photos to show
                     if let total =  dictionary["total"] as? String{
                         photoCount = (total as NSString).integerValue
                     }
@@ -108,7 +122,7 @@ class VTClient: NSObject {
                                 //Make sure there is a valid string there
                                 if let url = photog["url_m"] as? String{
                                     //This will get removed once the photo objects are working
-                                    self.photoList.append(url)
+                                    //self.photoList.append(url)
                                     //create a dictionary
                                     let dictionary: [String : AnyObject] = [
                                         Photo.Keys.Url : photog["url_m"] as! String,
@@ -125,16 +139,19 @@ class VTClient: NSObject {
                                     //skip it
                                     continue
                                 }
-                                println("Photo URLs processed: \(self.photoList.count)")
+                                //println("Photo URLs processed: \(self.photoList.count)")
                             }
                             //return success
-                            println("Leaving getFlickrData")
+                            //println("Leaving getFlickrData")
                            completionhandler(success: true, error: nil)
                         }//photoArray
                         else{
-                            completionhandler(success: false, error: "No Photos Found")
+                            completionhandler(success: false, error: "Error Loading Photos")
                         }//photo retrieval failure
-                    }//photoCount
+                    }else{//photoCount
+                    //No photos to load. Nice alert for the folks, Rollo...
+                        completionhandler(success: false, error: "No Flickr Images Found for Location")
+                    }//no photo dialog
                 }//dictionary
             }//top if/else
         }//session Data

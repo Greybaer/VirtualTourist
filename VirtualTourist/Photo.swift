@@ -20,6 +20,7 @@ class Photo : NSManagedObject{
     
     @NSManaged var id: String
     @NSManaged var url: String
+    @NSManaged var loaded: Bool
     @NSManaged var location: Pin
     
     override init(entity: NSEntityDescription, insertIntoManagedObjectContext context: NSManagedObjectContext?) {
@@ -35,6 +36,7 @@ class Photo : NSManagedObject{
         //Dictionary
         id = dictionary[Keys.Id] as! String
         url = dictionary[Keys.Url] as! String
+        loaded = false
     }//init
     
     var image: UIImage? {

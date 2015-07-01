@@ -60,8 +60,15 @@
                             <outletCollection property="gestureRecognizers" destination="hnj-20-diM" appends="YES" id="iba-yq-kKu"/>
                         </connections>
                     </view>
-                    <navigationItem key="navigationItem" id="IKs-fb-iB0"/>
+                    <navigationItem key="navigationItem" id="IKs-fb-iB0">
+                        <barButtonItem key="rightBarButtonItem" title="Edit" id="caz-eL-orK">
+                            <connections>
+                                <action selector="editPins:" destination="vXZ-lx-hvc" id="Qx5-ya-s4g"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
                     <connections>
+                        <outlet property="editPinButton" destination="caz-eL-orK" id="c7n-PY-dYX"/>
                         <outlet property="longpress" destination="hnj-20-diM" id="diU-P0-eYd"/>
                         <outlet property="mapView" destination="O2B-aF-e33" id="4ok-dy-01Z"/>
                         <segue destination="fAV-2e-NrT" kind="show" identifier="showCollection" id="aJS-Lm-hTn"/>
@@ -92,7 +99,11 @@
                                 <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
                                 <items>
                                     <barButtonItem style="plain" systemItem="flexibleSpace" id="V5W-0G-NfQ"/>
-                                    <barButtonItem title="New Collection" id="Qie-vi-hXZ"/>
+                                    <barButtonItem title="New Collection" id="Qie-vi-hXZ">
+                                        <connections>
+                                            <action selector="newCollection:" destination="fAV-2e-NrT" id="RgW-ED-gHo"/>
+                                        </connections>
+                                    </barButtonItem>
                                     <barButtonItem style="plain" systemItem="flexibleSpace" id="bkr-5M-NJj"/>
                                 </items>
                             </toolbar>
@@ -126,15 +137,15 @@
                                                 <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="bP4-jW-APW">
                                                     <rect key="frame" x="0.0" y="0.0" width="240" height="128"/>
                                                 </imageView>
-                                                <activityIndicatorView hidden="YES" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" hidesWhenStopped="YES" style="white" translatesAutoresizingMaskIntoConstraints="NO" id="JCH-LR-gUP">
+                                                <activityIndicatorView hidden="YES" opaque="NO" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" hidesWhenStopped="YES" style="white" translatesAutoresizingMaskIntoConstraints="NO" id="JCH-LR-gUP">
                                                     <rect key="frame" x="-10" y="-10" width="20" height="20"/>
                                                 </activityIndicatorView>
                                             </subviews>
                                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </view>
                                         <constraints>
-                                            <constraint firstItem="JCH-LR-gUP" firstAttribute="leading" secondItem="FrH-CY-l0P" secondAttribute="leadingMargin" constant="47" id="4Hl-W1-vWd"/>
-                                            <constraint firstItem="JCH-LR-gUP" firstAttribute="top" secondItem="FrH-CY-l0P" secondAttribute="topMargin" constant="47" id="c87-I9-emH"/>
+                                            <constraint firstItem="JCH-LR-gUP" firstAttribute="leading" secondItem="FrH-CY-l0P" secondAttribute="leadingMargin" constant="47" id="1nR-oM-hJz"/>
+                                            <constraint firstItem="JCH-LR-gUP" firstAttribute="top" secondItem="FrH-CY-l0P" secondAttribute="topMargin" constant="47" id="7rm-NW-ZrI"/>
                                             <constraint firstItem="bP4-jW-APW" firstAttribute="top" secondItem="FrH-CY-l0P" secondAttribute="top" id="h0O-a7-wFs"/>
                                             <constraint firstAttribute="trailing" secondItem="bP4-jW-APW" secondAttribute="trailing" id="kqS-gf-mtA"/>
                                             <constraint firstItem="bP4-jW-APW" firstAttribute="leading" secondItem="FrH-CY-l0P" secondAttribute="leading" id="uDE-6K-kle"/>
@@ -146,12 +157,12 @@
                                                 <exclude reference="JCH-LR-gUP"/>
                                             </mask>
                                             <mask key="constraints">
+                                                <exclude reference="1nR-oM-hJz"/>
+                                                <exclude reference="7rm-NW-ZrI"/>
                                                 <exclude reference="h0O-a7-wFs"/>
                                                 <exclude reference="kqS-gf-mtA"/>
                                                 <exclude reference="uDE-6K-kle"/>
                                                 <exclude reference="v88-eY-iqh"/>
-                                                <exclude reference="4Hl-W1-vWd"/>
-                                                <exclude reference="c87-I9-emH"/>
                                             </mask>
                                         </variation>
                                         <variation key="widthClass=compact">
@@ -160,12 +171,12 @@
                                                 <include reference="JCH-LR-gUP"/>
                                             </mask>
                                             <mask key="constraints">
+                                                <include reference="1nR-oM-hJz"/>
+                                                <include reference="7rm-NW-ZrI"/>
                                                 <include reference="h0O-a7-wFs"/>
                                                 <include reference="kqS-gf-mtA"/>
                                                 <include reference="uDE-6K-kle"/>
                                                 <include reference="v88-eY-iqh"/>
-                                                <include reference="4Hl-W1-vWd"/>
-                                                <include reference="c87-I9-emH"/>
                                             </mask>
                                         </variation>
                                         <connections>

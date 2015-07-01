@@ -8,9 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		A801F1071B385A0400D04DE7 /* ImageCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = A801F1061B385A0400D04DE7 /* ImageCache.swift */; };
+		A81B43201B430F1300122781 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A81B431E1B430F1300122781 /* Main.storyboard */; };
 		A83EA26A1B306E1F006E8822 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A83EA2691B306E1F006E8822 /* AppDelegate.swift */; };
 		A83EA26C1B306E1F006E8822 /* MapViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A83EA26B1B306E1F006E8822 /* MapViewController.swift */; };
-		A83EA26F1B306E1F006E8822 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A83EA26D1B306E1F006E8822 /* Main.storyboard */; };
 		A83EA2711B306E1F006E8822 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A83EA2701B306E1F006E8822 /* Images.xcassets */; };
 		A83EA2741B306E1F006E8822 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = A83EA2721B306E1F006E8822 /* LaunchScreen.xib */; };
 		A83EA2801B306E1F006E8822 /* VirtualTouristTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A83EA27F1B306E1F006E8822 /* VirtualTouristTests.swift */; };
@@ -36,11 +36,11 @@
 
 /* Begin PBXFileReference section */
 		A801F1061B385A0400D04DE7 /* ImageCache.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageCache.swift; sourceTree = "<group>"; };
+		A81B431F1B430F1300122781 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		A83EA2641B306E1F006E8822 /* VirtualTourist.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = VirtualTourist.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A83EA2681B306E1F006E8822 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A83EA2691B306E1F006E8822 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		A83EA26B1B306E1F006E8822 /* MapViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapViewController.swift; sourceTree = "<group>"; };
-		A83EA26E1B306E1F006E8822 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		A83EA2701B306E1F006E8822 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		A83EA2731B306E1F006E8822 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
 		A83EA2791B306E1F006E8822 /* VirtualTouristTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = VirtualTouristTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -106,8 +106,8 @@
 				A801F1061B385A0400D04DE7 /* ImageCache.swift */,
 				A8D7525F1B31C14C00229A52 /* VTConstants.swift */,
 				A83EA28B1B309D66006E8822 /* VirtualTourist.xcdatamodeld */,
-				A83EA26D1B306E1F006E8822 /* Main.storyboard */,
 				A83EA2701B306E1F006E8822 /* Images.xcassets */,
+				A81B431E1B430F1300122781 /* Main.storyboard */,
 				A83EA2721B306E1F006E8822 /* LaunchScreen.xib */,
 				A83EA2671B306E1F006E8822 /* Supporting Files */,
 			);
@@ -219,7 +219,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A83EA26F1B306E1F006E8822 /* Main.storyboard in Resources */,
+				A81B43201B430F1300122781 /* Main.storyboard in Resources */,
 				A83EA2741B306E1F006E8822 /* LaunchScreen.xib in Resources */,
 				A83EA2711B306E1F006E8822 /* Images.xcassets in Resources */,
 			);
@@ -272,10 +272,10 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
-		A83EA26D1B306E1F006E8822 /* Main.storyboard */ = {
+		A81B431E1B430F1300122781 /* Main.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
-				A83EA26E1B306E1F006E8822 /* Base */,
+				A81B431F1B430F1300122781 /* Base */,
 			);
 			name = Main.storyboard;
 			sourceTree = "<group>";

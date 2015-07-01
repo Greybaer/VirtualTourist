@@ -58,7 +58,7 @@ class ImageCache {
         if image == nil {
             memoryCache.removeObjectForKey(path)
             NSFileManager.defaultManager().removeItemAtPath(path, error: nil)
-            println("Image deleted")
+            //println("Image deleted")
             return
         }
         
@@ -68,7 +68,7 @@ class ImageCache {
         // ...and save it
         let data = UIImagePNGRepresentation(image!)
         if  data.writeToFile(path, atomically: true) {
-            println("Image stored")
+            //println("Image stored")
         }
     }
 

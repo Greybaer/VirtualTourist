@@ -10,16 +10,18 @@ import UIKit
 import MapKit
 import CoreData
 
-class CollectionViewController: UIViewController, UICollectionViewDataSource, MKMapViewDelegate, NSFetchedResultsControllerDelegate {
+class CollectionViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate, MKMapViewDelegate, NSFetchedResultsControllerDelegate {
 
     //Outlets
     @IBOutlet weak var newCollectionButton: UIBarButtonItem!
     @IBOutlet weak var staticMap: MKMapView!
     @IBOutlet weak var photoCollection: UICollectionView!
+    @IBOutlet weak var trashIcon: UIImageView!
+    
+    //Actions
     
     //Variables
     //This gets passed in by the segue
-    //var photoAnnotation: MKAnnotation!
     var annotation: Pin!
 
     //Shorthand for the CoreData context
@@ -30,6 +32,13 @@ class CollectionViewController: UIViewController, UICollectionViewDataSource, MK
     //Keep track of selected cells for removal
     var selectedIndexes = [NSIndexPath]()
 
+    //Keep track of how many cells have been loaded to determine
+    //when to enable New Collection Button
+    var cellCount = 0
+    
+    //Grab and save the value of the default tintcolor for the New Collection Button
+    var defaultButtonColor: UIColor!
+    
     //Indexes for batch operations using NSFetchController
     var insertedIndexPaths: [NSIndexPath]!
     var deletedIndexPaths: [NSIndexPath]!
@@ -38,8 +47,12 @@ class CollectionViewController: UIViewController, UICollectionViewDataSource, MK
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        //Grab and save the default tintcolot for the button
+        defaultButtonColor = newCollectionButton.tintColor
         //We're our own map delegate
         staticMap.delegate = self
+        //and our own collectionview delegate
+        photoCollection.delegate = self
         //Disable the new collection button
         newCollectionButton.enabled = false
         // Start the fetched results controller
@@ -48,7 +61,9 @@ class CollectionViewController: UIViewController, UICollectionViewDataSource, MK
         fetchedResultsController.performFetch(&error)
         
         if let error = error {
-            println("Error performing initial fetch: \(error)")
+            //println("Error performing initial fetch: \(error)")
+            VTClient.sharedInstance().errorDialog(self, errTitle: "Image Fetch Error", action: "OK", errMsg: "Error performing initial image fetch")
+
         }
         fetchedResultsController.delegate = self
 
@@ -67,20 +82,20 @@ class CollectionViewController: UIViewController, UICollectionViewDataSource, MK
                     VTClient.sharedInstance().errorDialog(self, errTitle: "Unable to Obtain Photo Data", action: "OK", errMsg: errorString!)
                 }
             }//getFlickerData
-            //Increment the page number now. If we need to load a new collection we're pre-set
-            annotation.page++
+            //Increment the page number now to reflect we've loaded the first page
+            //annotation.page++
             //Save the context to capture the page number
             CoreDataStackManager.sharedInstance().saveContext()
         }//if
+        //println("Pin page is \(annotation.page) in ViewWillAppear()")
     }//viewWillAppear
     
-    override func viewDidAppear(animated: Bool) {
-    }
-
+ 
     //***************************************************
     // Collection View Methods
     //***************************************************
     
+    //***************************************************
     // Layout the collection view so it's pretty
     // Thanks Mark & Jason!
     override func viewDidLayoutSubviews() {
@@ -99,30 +114,60 @@ class CollectionViewController: UIViewController, UICollectionViewDataSource, MK
         photoCollection.collectionViewLayout = layout
     }
 
+    //***************************************************
     //Number of sections - superfluous?
     func numberOfSectionsInCollectionView(collectionView: UICollectionView) -> Int {
         return self.fetchedResultsController.sections?.count ?? 0
     }
 
+    //***************************************************
     //Number of photos
     func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         //return VTClient.sharedInstance().photoList.count
         let sectionInfo = self.fetchedResultsController.sections![section] as! NSFetchedResultsSectionInfo
         
-        println("number Of Cells: \(sectionInfo.numberOfObjects)")
+        //println("number Of Cells: \(sectionInfo.numberOfObjects)")
+        //Grab the number and save it for use in configureCell
+        cellCount = sectionInfo.numberOfObjects
         return sectionInfo.numberOfObjects
     }
     
+    //***************************************************
     //Populate the cells
     func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
-        println("Entered cellForItem")
-
+        //println("Entered cellForItem")
+        //define a cell
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier("CollectionViewCell", forIndexPath: indexPath) as! CollectionViewCell
         //Functionality moved to configureCell
         configureCell(cell, atIndexPath: indexPath)
+        configureToolbar()
         return cell
     }//cellForItemAtIndexPath
     
+    //***************************************************
+    // User selected a cell, so toggle for delete if required
+    func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
+        //println("Entering didSelectItemAtIndexPath")
+        //define a cell
+        let cell = collectionView.dequeueReusableCellWithReuseIdentifier("CollectionViewCell", forIndexPath: indexPath) as! CollectionViewCell
+        
+        //Check for cell toggle condition
+        if let index = find(selectedIndexes, indexPath){
+            selectedIndexes.removeAtIndex(index)
+        }else{
+            selectedIndexes.append(indexPath)
+        }
+             
+        //Force the cell to reload!
+        var paths = [indexPath]
+        photoCollection.reloadItemsAtIndexPaths(paths)
+        
+        //then configure the toolbar
+        configureToolbar()
+    }//didSelectItem
+    
+    //***************************************************
+    // Configure the display view for the cell using fetchresultscontroller information
     func configureCell(cell:CollectionViewCell, atIndexPath indexPath:NSIndexPath) {
         //Grab the photo object
         let photo = self.fetchedResultsController.objectAtIndexPath(indexPath) as! Photo
@@ -138,8 +183,11 @@ class CollectionViewController: UIViewController, UICollectionViewDataSource, MK
             //Start downloading in the background
             let task = VTClient.sharedInstance().taskForImage(photo.url) {data, error in
                 if let loadError = error{
-                    println("Error loading Flickr image")
-                    cell.cellSpinner.stopAnimating()
+                    //println("Error loading Flickr image")
+                    dispatch_async(dispatch_get_main_queue()) {
+                        cell.photo.image =  UIImage(named: "nophoto.png")
+                        cell.cellSpinner.stopAnimating()
+                    }//dispatch
                 }
                 if let imageData = data{
                     //We got an image, so grab it
@@ -148,7 +196,11 @@ class CollectionViewController: UIViewController, UICollectionViewDataSource, MK
                     photo.image = image
                     //And update the cell on the main thread
                     dispatch_async(dispatch_get_main_queue()) {
+                        //set the flag so we know it's on disk
+                        photo.loaded = true
+                        //set the image
                         cell.photo.image = image
+                        //stop the spinner
                         cell.cellSpinner.stopAnimating()
                         //Save the context
                         CoreDataStackManager.sharedInstance().saveContext()
@@ -165,10 +217,14 @@ class CollectionViewController: UIViewController, UICollectionViewDataSource, MK
             cell.cancelTaskOnReuse = task
         }//if/else
         //Drop in the image
-        dispatch_async(dispatch_get_main_queue()) {
+            //Load the final resulting image
             cell.photo.image = cellImage
-        }//dispatch
-    }//configureCell
+        if let index = find(selectedIndexes, indexPath){
+            cell.photo.alpha = 0.5
+        }else{
+            cell.photo.alpha = 1.0
+        }
+     }//configureCell
     
     //***************************************************
     // Configure the appearance and function of each annotation as it's added
@@ -181,7 +237,7 @@ class CollectionViewController: UIViewController, UICollectionViewDataSource, MK
         if pinView == nil {
             pinView = MKPinAnnotationView(annotation: annotation, reuseIdentifier: reuseId)
             pinView!.canShowCallout = false
-            pinView!.pinColor = .Red
+            pinView!.pinColor = .Green
         }
         else {
             pinView!.annotation = annotation
@@ -189,12 +245,92 @@ class CollectionViewController: UIViewController, UICollectionViewDataSource, MK
         
         return pinView
     }//mapView - viewForAnnotation
+ 
+  
+    //***************************************************
+    // Button Action method - Load new or delete photos
+    @IBAction func newCollection(sender: UIBarButtonItem) {
+        if !selectedIndexes.isEmpty{
+            deleteSelected()
+        }else{
+            loadNewCollection()
+        }
+    }//newCollection
+    
+    //***************************************************
+    // Delete selected photos
+    func deleteSelected(){
+        var photosToDelete = [Photo]()
+        
+        for indexPath in selectedIndexes {
+            photosToDelete.append(fetchedResultsController.objectAtIndexPath(indexPath) as! Photo)
+        }
+        for photo in photosToDelete {
+            sharedContext.deleteObject(photo)
+        }
+        CoreDataStackManager.sharedInstance().saveContext()
+        selectedIndexes = [NSIndexPath]()
+        configureToolbar()
+    }//deleteSelected
+    
+    //***************************************************
+    // Load a new Collection when the button is pressed
+    func loadNewCollection(){
+        //If we're here, the user has loaded at least one collection. Increment to get next page
+        annotation.page++
+        //Disable the button until the new photos are all loaded
+        self.newCollectionButton.enabled = false
+        //First, delete the old collection
+        for photo in fetchedResultsController.fetchedObjects as! [Photo]{
+            sharedContext.deleteObject(photo)
+        }
+        //Save the context - not sure this is needed, but shouldn't hurt
+        //CoreDataStackManager.sharedInstance().saveContext()
+        //println("Pin values exiting newCollection: \(annotation.latitude)|\(annotation.longitude)|\(annotation.page)|\(annotation.lastPage)")
+
+        //Now got get a new collection
+        //println("Pin page is \(annotation.page) in newCollection()")
+        VTClient.sharedInstance().getFlickrData(annotation){(success, errorString) in
+            if !success{
+                VTClient.sharedInstance().errorDialog(self, errTitle: "Unable to Obtain Photo Data", action: "OK", errMsg: errorString!)
+            }
+        }//getFlickerData
+        //And save
+        dispatch_async(dispatch_get_main_queue()) {
+            CoreDataStackManager.sharedInstance().saveContext()
+        }
+    }//loadnewCollection
+    
+    //***************************************************
+    // Configure the toolbar for the function needed
+    func configureToolbar(){
+        if selectedIndexes.count > 0{
+            newCollectionButton.tintColor = UIColor.redColor()
+            newCollectionButton.title = "Delete Selected Photos"
+            newCollectionButton.enabled = true
+        }else{
+            newCollectionButton.tintColor = defaultButtonColor
+            newCollectionButton.title = "New Collection"
+            //Check to see if the cells are loaded before enabling the button
+            let photos = fetchedResultsController.fetchedObjects as! [Photo]
+            let notLoaded = photos.filter{
+                $0.loaded == false
+            }
+            if notLoaded.count > 0{
+                newCollectionButton.enabled = false
+            }else{
+                newCollectionButton.enabled = true
+            
+            }
+        }
+    }//configureToolbar
     
     //***************************************************
     // Set the static map to the location passed in from the Map View
     func setStaticMap() {
         //Center the map on the location we care about
-        let center = CLLocationCoordinate2DMake(self.annotation.latitude as Double, self.annotation.longitude as Double)        //zoom the map region to the location
+        let center = CLLocationCoordinate2DMake(self.annotation.latitude as Double, self.annotation.longitude as Double)
+        //zoom the map region to the location
         let region = MKCoordinateRegion(center: center, span: MKCoordinateSpan(latitudeDelta: 1.0, longitudeDelta: 1.0))
         self.staticMap.setRegion(region, animated: true)
         //Add the annotation
@@ -231,15 +367,15 @@ class CollectionViewController: UIViewController, UICollectionViewDataSource, MK
     func controller(controller: NSFetchedResultsController, didChangeObject anObject: AnyObject, atIndexPath indexPath: NSIndexPath?, forChangeType type: NSFetchedResultsChangeType, newIndexPath: NSIndexPath?) {
         switch type {
         case .Insert:
-            println("Item added")
+            //println("Item added")
             insertedIndexPaths.append(newIndexPath!)
             break
         case .Update:
-            println("Item updated")
+            //println("Item updated")
             updatedIndexPaths.append(indexPath!)
             break
         case .Delete:
-            println("Item deleted")
+            //println("Item deleted")
             deletedIndexPaths.append(indexPath!)
             break
         default:
@@ -251,7 +387,7 @@ class CollectionViewController: UIViewController, UICollectionViewDataSource, MK
     // Batch Process the changes
     func controllerDidChangeContent(controller: NSFetchedResultsController) {
         
-        println("in controllerDidChangeContent changes count: \(deletedIndexPaths.count) \(insertedIndexPaths.count)")
+        //println("in controllerDidChangeContent changes count: \(deletedIndexPaths.count) \(insertedIndexPaths.count)")
         
         photoCollection.performBatchUpdates({ () -> Void in
             for indexPath in self.insertedIndexPaths {
@@ -267,7 +403,4 @@ class CollectionViewController: UIViewController, UICollectionViewDataSource, MK
             
             }, completion: nil)
     }//controllerDidChangeContent
-
-
-
 }//class
