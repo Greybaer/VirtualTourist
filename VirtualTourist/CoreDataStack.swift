@@ -44,7 +44,8 @@ class CoreDataStackManager{
         return Static.instance
     }//sharedInstance()
     
-    // The directory the application uses to store the Core Data store file. This code uses a directory named "com.infiniteloop-slc.VirtualTourist" in the application's documents Application Support directory
+    // The directory the application uses to store the Core Data store file. 
+    // This code uses a directory named "com.infiniteloop-slc.VirtualTourist" in the application's documents Application Support directory
     lazy var applicationDocumentsDirectory: NSURL = {
         let urls = NSFileManager.defaultManager().URLsForDirectory(.DocumentDirectory, inDomains: .UserDomainMask)
         return urls[urls.count-1] as! NSURL
@@ -103,4 +104,5 @@ class CoreDataStackManager{
             }
         }
     }//saveContext
+    
 }//CoreData class

@@ -55,7 +55,10 @@ class MapViewController: UIViewController, MKMapViewDelegate {
     //Boolean value for pin add/delete
     var deletePins = false
     
+    //***************************************************
     //Class methods
+    //***************************************************
+
     override func viewDidLoad() {
         super.viewDidLoad()
         //we're our own map delegate
@@ -67,37 +70,7 @@ class MapViewController: UIViewController, MKMapViewDelegate {
         loadPins()
         //println("Loaded Pins")
     }//viewDidLoad
-    
-    
-    //***************************************************
-    // Save the mapRegion with NSKeyedArchiver
-    func saveMapRegion() {
-        let mapRegionDictionary = [
-            Map.Latitude : mapView.region.center.latitude,
-            Map.Longitude : mapView.region.center.longitude,
-            Map.LatitudeDelta : mapView.region.span.latitudeDelta,
-            Map.LongitudeDelta : mapView.region.span.longitudeDelta
-        ]
-        NSKeyedArchiver.archiveRootObject(mapRegionDictionary, toFile: mapRegionFilePath)
-    }
-    
-    //***************************************************
-    // Restore the map to the previously saved region
-    func restoreMapRegion(animated: Bool) {
-        if let mapRegionDictionary = NSKeyedUnarchiver.unarchiveObjectWithFile(mapRegionFilePath) as? [String:AnyObject] {
-            
-            let longitude = mapRegionDictionary[Map.Longitude] as! CLLocationDegrees
-            let latitude = mapRegionDictionary[Map.Latitude] as! CLLocationDegrees
-            let center = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
-            
-            let longitudeDelta = mapRegionDictionary[Map.LongitudeDelta] as! CLLocationDegrees
-            let latitudeDelta = mapRegionDictionary[Map.LatitudeDelta] as! CLLocationDegrees
-            let span = MKCoordinateSpan(latitudeDelta: latitudeDelta, longitudeDelta: longitudeDelta)
-            
-            let savedRegion = MKCoordinateRegion(center: center, span: span)
-            mapView.setRegion(savedRegion, animated: animated)
-        }
-    }
+  
 
 
     //***************************************************
@@ -144,7 +117,9 @@ class MapViewController: UIViewController, MKMapViewDelegate {
             //Add it to the array here as well
             self.annotations.append(newPin)
             //Save to the context
-            CoreDataStackManager.sharedInstance().saveContext()
+            dispatch_async(dispatch_get_main_queue()) {
+                CoreDataStackManager.sharedInstance().saveContext()
+            }
             //Enable the edit pin button
             editPinButton.enabled = true
         }//longpress
@@ -165,7 +140,7 @@ class MapViewController: UIViewController, MKMapViewDelegate {
             deletePins = false
             editPinButton.title = "Edit"
         }
-    }
+    }//editPins
     
 
     //***************************************************
@@ -176,7 +151,7 @@ class MapViewController: UIViewController, MKMapViewDelegate {
     // User changed the map region, so save it
     func mapView(mapView: MKMapView!, regionDidChangeAnimated animated: Bool) {
         saveMapRegion()
-    }
+    }//regionDidChangeAnimated
     
 
     //***************************************************
@@ -212,7 +187,7 @@ class MapViewController: UIViewController, MKMapViewDelegate {
             //save the context
             CoreDataStackManager.sharedInstance().saveContext()
             //Remove the pin from the annotations array
-            removePinFromAnnotations(pinToDelete!)
+            annotations = VTClient.sharedInstance().removePinFromAnnotations(pinToDelete!, annotations: annotations)
             //delete the annotation from the map
             mapView.removeAnnotation(view.annotation)
             if annotations.count < 1{
@@ -240,7 +215,38 @@ class MapViewController: UIViewController, MKMapViewDelegate {
     //***************************************************
 
     //***************************************************
+    // Save the mapRegion with NSKeyedArchiver
+    func saveMapRegion() {
+        let mapRegionDictionary = [
+            Map.Latitude : mapView.region.center.latitude,
+            Map.Longitude : mapView.region.center.longitude,
+            Map.LatitudeDelta : mapView.region.span.latitudeDelta,
+            Map.LongitudeDelta : mapView.region.span.longitudeDelta
+        ]
+        NSKeyedArchiver.archiveRootObject(mapRegionDictionary, toFile: mapRegionFilePath)
+    }//saveMapRegion
+    
+    //***************************************************
+    // Restore the map to the previously saved region
+    func restoreMapRegion(animated: Bool) {
+        if let mapRegionDictionary = NSKeyedUnarchiver.unarchiveObjectWithFile(mapRegionFilePath) as? [String:AnyObject] {
+            
+            let longitude = mapRegionDictionary[Map.Longitude] as! CLLocationDegrees
+            let latitude = mapRegionDictionary[Map.Latitude] as! CLLocationDegrees
+            let center = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+            
+            let longitudeDelta = mapRegionDictionary[Map.LongitudeDelta] as! CLLocationDegrees
+            let latitudeDelta = mapRegionDictionary[Map.LatitudeDelta] as! CLLocationDegrees
+            let span = MKCoordinateSpan(latitudeDelta: latitudeDelta, longitudeDelta: longitudeDelta)
+            
+            let savedRegion = MKCoordinateRegion(center: center, span: span)
+            mapView.setRegion(savedRegion, animated: animated)
+        }
+    }//restoreMapRegion
+
+    //***************************************************
     // loadPins - Load pin data from CoreData and display them
+    // This stays here because it' smuch easier than passing a whole bunch of data
     func loadPins(){
         //Default the Edit button to disabled
         editPinButton.enabled = false
@@ -274,15 +280,4 @@ class MapViewController: UIViewController, MKMapViewDelegate {
         }//fetchRequest
     }//loadPins
     
-    func removePinFromAnnotations(pin: Pin){
-        //filter the array and return an array without matching element
-        let ann_array = annotations.filter{
-            $0.latitude != pin.latitude &&
-            $0.longitude != pin.longitude
-        }
-        //Save the new array minus the match
-        annotations = ann_array
-    }//removePins
-
-}
-
+}//class

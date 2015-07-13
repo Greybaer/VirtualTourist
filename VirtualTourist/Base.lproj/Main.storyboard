@@ -144,8 +144,12 @@
                                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </view>
                                         <constraints>
-                                            <constraint firstItem="JCH-LR-gUP" firstAttribute="leading" secondItem="FrH-CY-l0P" secondAttribute="leadingMargin" constant="47" id="1nR-oM-hJz"/>
-                                            <constraint firstItem="JCH-LR-gUP" firstAttribute="top" secondItem="FrH-CY-l0P" secondAttribute="topMargin" constant="47" id="7rm-NW-ZrI"/>
+                                            <constraint firstItem="JCH-LR-gUP" firstAttribute="leading" secondItem="FrH-CY-l0P" secondAttribute="leadingMargin" constant="47" id="1nR-oM-hJz">
+                                                <variation key="widthClass=compact" constant="41"/>
+                                            </constraint>
+                                            <constraint firstItem="JCH-LR-gUP" firstAttribute="top" secondItem="FrH-CY-l0P" secondAttribute="topMargin" constant="47" id="7rm-NW-ZrI">
+                                                <variation key="widthClass=compact" constant="42"/>
+                                            </constraint>
                                             <constraint firstItem="bP4-jW-APW" firstAttribute="top" secondItem="FrH-CY-l0P" secondAttribute="top" id="h0O-a7-wFs"/>
                                             <constraint firstAttribute="trailing" secondItem="bP4-jW-APW" secondAttribute="trailing" id="kqS-gf-mtA"/>
                                             <constraint firstItem="bP4-jW-APW" firstAttribute="leading" secondItem="FrH-CY-l0P" secondAttribute="leading" id="uDE-6K-kle"/>

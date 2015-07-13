@@ -23,7 +23,7 @@ class ImageCache {
         
         let fullPathURL = documentsDirectoryURL.URLByAppendingPathComponent(identifier)
         return fullPathURL.path!
-    }
+    }//pathForIdentifier
 
     //***************************************************
     // Retrieve image
@@ -70,8 +70,6 @@ class ImageCache {
         if  data.writeToFile(path, atomically: true) {
             //println("Image stored")
         }
-    }
-
-
+    }//storeImage
     
 }//ImageCache

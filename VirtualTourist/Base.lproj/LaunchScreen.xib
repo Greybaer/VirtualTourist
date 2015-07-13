@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="6214" systemVersion="14A314h" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" launchScreen="YES" useTraitCollections="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="7706" systemVersion="14D136" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" launchScreen="YES" useTraitCollections="YES">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6207"/>
-        <capability name="Constraints with non-1.0 multipliers" minToolsVersion="5.1"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="7703"/>
+        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
     </dependencies>
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
@@ -11,31 +11,123 @@
             <rect key="frame" x="0.0" y="0.0" width="480" height="480"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
-                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="  Copyright (c) 2015 Infinite Loop, LLC. All rights reserved." textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumFontSize="9" translatesAutoresizingMaskIntoConstraints="NO" id="8ie-xW-0ye">
-                    <rect key="frame" x="20" y="439" width="441" height="21"/>
-                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                    <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                <imageView userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Sexton and Compass Wallp TLG" translatesAutoresizingMaskIntoConstraints="NO" id="n0A-xn-NKI">
+                    <rect key="frame" x="0.0" y="0.0" width="240" height="128"/>
+                </imageView>
+                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="VTLogo" translatesAutoresizingMaskIntoConstraints="NO" id="cYP-uo-1v9">
+                    <rect key="frame" x="0.0" y="0.0" width="240" height="128"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="125" id="ehK-EI-fed"/>
+                    </constraints>
+                    <variation key="default">
+                        <mask key="constraints">
+                            <exclude reference="ehK-EI-fed"/>
+                        </mask>
+                    </variation>
+                    <variation key="widthClass=compact">
+                        <mask key="constraints">
+                            <include reference="ehK-EI-fed"/>
+                        </mask>
+                    </variation>
+                </imageView>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="©2015 Infinite Loop, LLC" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="0Cc-8Q-KRv">
+                    <rect key="frame" x="0.0" y="-21" width="42" height="21"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="21" id="8mK-yT-fnx"/>
+                    </constraints>
+                    <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="15"/>
+                    <color key="textColor" red="0.97647064924240112" green="0.90980398654937744" blue="0.20784315466880798" alpha="1" colorSpace="deviceRGB"/>
                     <nil key="highlightedColor"/>
+                    <variation key="default">
+                        <mask key="constraints">
+                            <exclude reference="8mK-yT-fnx"/>
+                        </mask>
+                    </variation>
+                    <variation key="widthClass=compact">
+                        <mask key="constraints">
+                            <include reference="8mK-yT-fnx"/>
+                        </mask>
+                    </variation>
                 </label>
-                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="VirtualTourist" textAlignment="center" lineBreakMode="middleTruncation" baselineAdjustment="alignBaselines" minimumFontSize="18" translatesAutoresizingMaskIntoConstraints="NO" id="kId-c2-rCX">
-                    <rect key="frame" x="20" y="140" width="441" height="43"/>
-                    <fontDescription key="fontDescription" type="boldSystem" pointSize="36"/>
-                    <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Submitted in fulfillment of the Udacity ios nanodegree" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="WBv-NR-UdZ">
+                    <rect key="frame" x="0.0" y="-21" width="42" height="21"/>
+                    <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="14"/>
+                    <color key="textColor" red="0.97647064920000004" green="0.90980398650000005" blue="0.2078431547" alpha="1" colorSpace="deviceRGB"/>
                     <nil key="highlightedColor"/>
                 </label>
             </subviews>
             <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
             <constraints>
-                <constraint firstItem="kId-c2-rCX" firstAttribute="centerY" secondItem="iN0-l3-epB" secondAttribute="bottom" multiplier="1/3" constant="1" id="5cJ-9S-tgC"/>
-                <constraint firstAttribute="centerX" secondItem="kId-c2-rCX" secondAttribute="centerX" id="Koa-jz-hwk"/>
-                <constraint firstAttribute="bottom" secondItem="8ie-xW-0ye" secondAttribute="bottom" constant="20" id="Kzo-t9-V3l"/>
-                <constraint firstItem="8ie-xW-0ye" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" constant="20" symbolic="YES" id="MfP-vx-nX0"/>
-                <constraint firstAttribute="centerX" secondItem="8ie-xW-0ye" secondAttribute="centerX" id="ZEH-qu-HZ9"/>
-                <constraint firstItem="kId-c2-rCX" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" constant="20" symbolic="YES" id="fvb-Df-36g"/>
+                <constraint firstItem="WBv-NR-UdZ" firstAttribute="leading" secondItem="0Cc-8Q-KRv" secondAttribute="leading" id="0Sq-6k-eAJ"/>
+                <constraint firstAttribute="bottom" secondItem="n0A-xn-NKI" secondAttribute="bottom" id="26N-lS-KI8"/>
+                <constraint firstItem="0Cc-8Q-KRv" firstAttribute="trailing" secondItem="cYP-uo-1v9" secondAttribute="trailing" id="2hT-nv-8o5"/>
+                <constraint firstItem="cYP-uo-1v9" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" constant="-8" id="4fT-7j-bcU"/>
+                <constraint firstAttribute="bottom" secondItem="WBv-NR-UdZ" secondAttribute="bottom" constant="13" id="CCp-zm-22T"/>
+                <constraint firstItem="WBv-NR-UdZ" firstAttribute="top" secondItem="0Cc-8Q-KRv" secondAttribute="bottom" constant="2" id="DgU-Mm-c4O"/>
+                <constraint firstItem="WBv-NR-UdZ" firstAttribute="trailing" secondItem="0Cc-8Q-KRv" secondAttribute="trailing" id="Gfj-Ej-bD9"/>
+                <constraint firstItem="n0A-xn-NKI" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="OHO-rL-k4i"/>
+                <constraint firstAttribute="trailing" secondItem="n0A-xn-NKI" secondAttribute="trailing" id="SMP-b4-1wI"/>
+                <constraint firstItem="n0A-xn-NKI" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="aRj-Fw-3Df"/>
+                <constraint firstAttribute="bottom" secondItem="0Cc-8Q-KRv" secondAttribute="bottom" constant="36" id="rCN-iy-w3K"/>
+                <constraint firstItem="cYP-uo-1v9" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" constant="44" id="sGv-oO-h8e"/>
+                <constraint firstItem="cYP-uo-1v9" firstAttribute="trailing" secondItem="iN0-l3-epB" secondAttribute="trailingMargin" id="vFv-2R-tIE"/>
+                <constraint firstItem="0Cc-8Q-KRv" firstAttribute="centerX" secondItem="n0A-xn-NKI" secondAttribute="centerX" id="xU4-fg-1Ia"/>
             </constraints>
             <nil key="simulatedStatusBarMetrics"/>
             <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+            <variation key="default">
+                <mask key="subviews">
+                    <exclude reference="n0A-xn-NKI"/>
+                    <exclude reference="cYP-uo-1v9"/>
+                    <exclude reference="0Cc-8Q-KRv"/>
+                    <exclude reference="WBv-NR-UdZ"/>
+                </mask>
+                <mask key="constraints">
+                    <exclude reference="26N-lS-KI8"/>
+                    <exclude reference="OHO-rL-k4i"/>
+                    <exclude reference="SMP-b4-1wI"/>
+                    <exclude reference="aRj-Fw-3Df"/>
+                    <exclude reference="4fT-7j-bcU"/>
+                    <exclude reference="sGv-oO-h8e"/>
+                    <exclude reference="vFv-2R-tIE"/>
+                    <exclude reference="2hT-nv-8o5"/>
+                    <exclude reference="rCN-iy-w3K"/>
+                    <exclude reference="xU4-fg-1Ia"/>
+                    <exclude reference="0Sq-6k-eAJ"/>
+                    <exclude reference="CCp-zm-22T"/>
+                    <exclude reference="DgU-Mm-c4O"/>
+                    <exclude reference="Gfj-Ej-bD9"/>
+                </mask>
+            </variation>
+            <variation key="widthClass=compact">
+                <mask key="subviews">
+                    <include reference="n0A-xn-NKI"/>
+                    <include reference="cYP-uo-1v9"/>
+                    <include reference="0Cc-8Q-KRv"/>
+                    <include reference="WBv-NR-UdZ"/>
+                </mask>
+                <mask key="constraints">
+                    <include reference="26N-lS-KI8"/>
+                    <include reference="OHO-rL-k4i"/>
+                    <include reference="SMP-b4-1wI"/>
+                    <include reference="aRj-Fw-3Df"/>
+                    <include reference="4fT-7j-bcU"/>
+                    <include reference="sGv-oO-h8e"/>
+                    <include reference="vFv-2R-tIE"/>
+                    <include reference="2hT-nv-8o5"/>
+                    <include reference="rCN-iy-w3K"/>
+                    <include reference="xU4-fg-1Ia"/>
+                    <include reference="0Sq-6k-eAJ"/>
+                    <include reference="CCp-zm-22T"/>
+                    <include reference="DgU-Mm-c4O"/>
+                    <include reference="Gfj-Ej-bD9"/>
+                </mask>
+            </variation>
             <point key="canvasLocation" x="548" y="455"/>
         </view>
     </objects>
+    <resources>
+        <image name="Sexton and Compass Wallp TLG" width="1600" height="1200"/>
+        <image name="VTLogo" width="400" height="100"/>
+    </resources>
 </document>

@@ -34,8 +34,11 @@ class Photo : NSManagedObject{
         super.init(entity: entity, insertIntoManagedObjectContext: context)
         
         //Dictionary
+        //id from Flickr
         id = dictionary[Keys.Id] as! String
+        //path to inage location on the intarwebs
         url = dictionary[Keys.Url] as! String
+        //Is the image saved onto disk yet?
         loaded = false
     }//init
     
@@ -48,5 +51,5 @@ class Photo : NSManagedObject{
         }
     }
 
-}//class
+}//Photo
 

@@ -45,6 +45,10 @@ class CollectionViewController: UIViewController, UICollectionViewDataSource, UI
     var updatedIndexPaths: [NSIndexPath]!
 
     
+    //***************************************************
+    //Class methods
+    //***************************************************
+
     override func viewDidLoad() {
         super.viewDidLoad()
         //Grab and save the default tintcolot for the button
@@ -66,9 +70,7 @@ class CollectionViewController: UIViewController, UICollectionViewDataSource, UI
 
         }
         fetchedResultsController.delegate = self
-
-        
-    }
+    }//viewDidLoad
     
     override func viewWillAppear(animated: Bool) {
         //Use the passed in annotation to mark, center and zoom the map
@@ -82,17 +84,12 @@ class CollectionViewController: UIViewController, UICollectionViewDataSource, UI
                     VTClient.sharedInstance().errorDialog(self, errTitle: "Unable to Obtain Photo Data", action: "OK", errMsg: errorString!)
                 }
             }//getFlickerData
-            //Increment the page number now to reflect we've loaded the first page
-            //annotation.page++
-            //Save the context to capture the page number
-            CoreDataStackManager.sharedInstance().saveContext()
-        }//if
-        //println("Pin page is \(annotation.page) in ViewWillAppear()")
+       }//if
     }//viewWillAppear
     
  
     //***************************************************
-    // Collection View Methods
+    // Delegate Methods
     //***************************************************
     
     //***************************************************
@@ -112,13 +109,13 @@ class CollectionViewController: UIViewController, UICollectionViewDataSource, UI
         layout.itemSize = CGSize(width: width, height: width)
         //println("Image size \(width) X \(width)")
         photoCollection.collectionViewLayout = layout
-    }
+    }//viewDidLayoutSubviews
 
     //***************************************************
     //Number of sections - superfluous?
     func numberOfSectionsInCollectionView(collectionView: UICollectionView) -> Int {
         return self.fetchedResultsController.sections?.count ?? 0
-    }
+    }//numberOfSectionsInCollectionView
 
     //***************************************************
     //Number of photos
@@ -130,7 +127,7 @@ class CollectionViewController: UIViewController, UICollectionViewDataSource, UI
         //Grab the number and save it for use in configureCell
         cellCount = sectionInfo.numberOfObjects
         return sectionInfo.numberOfObjects
-    }
+    }//numberOfItemsInSection
     
     //***************************************************
     //Populate the cells
@@ -167,6 +164,26 @@ class CollectionViewController: UIViewController, UICollectionViewDataSource, UI
     }//didSelectItem
     
     //***************************************************
+    // Configure the appearance and function of each annotation as it's added
+    func mapView(mapView: MKMapView!, viewForAnnotation annotation: MKAnnotation!) -> MKAnnotationView! {
+        
+        let reuseId = "pin"
+        
+        var pinView = mapView.dequeueReusableAnnotationViewWithIdentifier(reuseId) as? MKPinAnnotationView
+        
+        if pinView == nil {
+            pinView = MKPinAnnotationView(annotation: annotation, reuseIdentifier: reuseId)
+            pinView!.canShowCallout = false
+            pinView!.pinColor = .Green
+        }
+        else {
+            pinView!.annotation = annotation
+        }
+        
+        return pinView
+    }//mapView - viewForAnnotation
+    
+    //***************************************************
     // Configure the display view for the cell using fetchresultscontroller information
     func configureCell(cell:CollectionViewCell, atIndexPath indexPath:NSIndexPath) {
         //Grab the photo object
@@ -177,7 +194,7 @@ class CollectionViewController: UIViewController, UICollectionViewDataSource, UI
         if photo.image != nil{
                 //replace the default with the cached image
                 cellImage = photo.image
-        }else{
+       }else{
             //Start the spinner
             cell.cellSpinner.startAnimating()
             //Start downloading in the background
@@ -194,10 +211,10 @@ class CollectionViewController: UIViewController, UICollectionViewDataSource, UI
                     let image = UIImage(data: imageData)
                     //Now update the cache to save it
                     photo.image = image
+                    //set the flag so we know it's on disk
+                    photo.loaded = true
                     //And update the cell on the main thread
                     dispatch_async(dispatch_get_main_queue()) {
-                        //set the flag so we know it's on disk
-                        photo.loaded = true
                         //set the image
                         cell.photo.image = image
                         //stop the spinner
@@ -219,6 +236,7 @@ class CollectionViewController: UIViewController, UICollectionViewDataSource, UI
         //Drop in the image
             //Load the final resulting image
             cell.photo.image = cellImage
+        //If the cell has been selected, mask it.
         if let index = find(selectedIndexes, indexPath){
             cell.photo.alpha = 0.5
         }else{
@@ -226,37 +244,25 @@ class CollectionViewController: UIViewController, UICollectionViewDataSource, UI
         }
      }//configureCell
     
-    //***************************************************
-    // Configure the appearance and function of each annotation as it's added
-    func mapView(mapView: MKMapView!, viewForAnnotation annotation: MKAnnotation!) -> MKAnnotationView! {
-        
-        let reuseId = "pin"
-        
-        var pinView = mapView.dequeueReusableAnnotationViewWithIdentifier(reuseId) as? MKPinAnnotationView
-        
-        if pinView == nil {
-            pinView = MKPinAnnotationView(annotation: annotation, reuseIdentifier: reuseId)
-            pinView!.canShowCallout = false
-            pinView!.pinColor = .Green
-        }
-        else {
-            pinView!.annotation = annotation
-        }
-        
-        return pinView
-    }//mapView - viewForAnnotation
- 
   
+    //***************************************************
+    // Action Methods
+    //***************************************************
+
     //***************************************************
     // Button Action method - Load new or delete photos
     @IBAction func newCollection(sender: UIBarButtonItem) {
         if !selectedIndexes.isEmpty{
             deleteSelected()
         }else{
-            loadNewCollection()
+           loadNewCollection()
         }
     }//newCollection
     
+    //***************************************************
+    // UI/View methods
+    //***************************************************
+
     //***************************************************
     // Delete selected photos
     func deleteSelected(){
@@ -268,7 +274,9 @@ class CollectionViewController: UIViewController, UICollectionViewDataSource, UI
         for photo in photosToDelete {
             sharedContext.deleteObject(photo)
         }
-        CoreDataStackManager.sharedInstance().saveContext()
+        dispatch_async(dispatch_get_main_queue()) {
+            CoreDataStackManager.sharedInstance().saveContext()
+        }
         selectedIndexes = [NSIndexPath]()
         configureToolbar()
     }//deleteSelected
@@ -276,20 +284,27 @@ class CollectionViewController: UIViewController, UICollectionViewDataSource, UI
     //***************************************************
     // Load a new Collection when the button is pressed
     func loadNewCollection(){
-        //If we're here, the user has loaded at least one collection. Increment to get next page
-        annotation.page++
-        //Disable the button until the new photos are all loaded
+      //Disable the button until the new photos are all loaded
         self.newCollectionButton.enabled = false
         //First, delete the old collection
         for photo in fetchedResultsController.fetchedObjects as! [Photo]{
             sharedContext.deleteObject(photo)
         }
         //Save the context - not sure this is needed, but shouldn't hurt
-        //CoreDataStackManager.sharedInstance().saveContext()
-        //println("Pin values exiting newCollection: \(annotation.latitude)|\(annotation.longitude)|\(annotation.page)|\(annotation.lastPage)")
+        //dispatch_async(dispatch_get_main_queue()) {
+        //    CoreDataStackManager.sharedInstance().saveContext()
+        //}
+        
+        //If we're here, the user has loaded at least one collection. Increment to get next page
+        annotation.page++
+        //Check to see if we're out of pages to load
+        if annotation.page > annotation.lastPage{
+            //Re-set the page
+            annotation.page = 1
+        }
 
         //Now got get a new collection
-        //println("Pin page is \(annotation.page) in newCollection()")
+        println("Pin page is \(annotation.page) in newCollection()")
         VTClient.sharedInstance().getFlickrData(annotation){(success, errorString) in
             if !success{
                 VTClient.sharedInstance().errorDialog(self, errTitle: "Unable to Obtain Photo Data", action: "OK", errMsg: errorString!)
@@ -299,6 +314,8 @@ class CollectionViewController: UIViewController, UICollectionViewDataSource, UI
         dispatch_async(dispatch_get_main_queue()) {
             CoreDataStackManager.sharedInstance().saveContext()
         }
+        configureToolbar()
+        println("Pin values exiting newCollection: \(annotation.latitude)|\(annotation.longitude)|\(annotation.page)|\(annotation.lastPage)")
     }//loadnewCollection
     
     //***************************************************

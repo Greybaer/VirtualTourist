@@ -29,14 +29,16 @@ class VTClient: NSObject {
     }
 
     //***************************************************
+    // Shared Object Methods
+    //***************************************************
+
+    //***************************************************
     //Create a shared session for the NSURLSession calls
     override init() {
         session = NSURLSession.sharedSession()
         super.init()
     }//init
 
-    //***************************************************
-    // Shared Object Methods
     
     //Shared Instance
     class func sharedInstance() -> VTClient {
@@ -51,7 +53,7 @@ class VTClient: NSObject {
     //Shared Image Cache
     struct Cache {
         static let imageCache = ImageCache()
-    }
+    }//cache
     
     //***************************************************
     // Network Functions
@@ -103,6 +105,7 @@ class VTClient: NSObject {
                     //Drop the value into the pin object
                     //println("Pin values in FlickrData: \(pin.latitude)|\(pin.longitude)|\(pin.page)|\(pin.lastPage)")
                     pin.lastPage = pages
+                    println("There are \(pin.lastPage) pages of images for this location")
                     //and save the context
                     dispatch_async(dispatch_get_main_queue()) {
                         CoreDataStackManager.sharedInstance().saveContext()
@@ -121,8 +124,6 @@ class VTClient: NSObject {
                             for photog in photoArray{
                                 //Make sure there is a valid string there
                                 if let url = photog["url_m"] as? String{
-                                    //This will get removed once the photo objects are working
-                                    //self.photoList.append(url)
                                     //create a dictionary
                                     let dictionary: [String : AnyObject] = [
                                         Photo.Keys.Url : photog["url_m"] as! String,
@@ -130,7 +131,7 @@ class VTClient: NSObject {
                                     ]
                                     //and init a new Photo object with the data
                                     let photo = Photo(dictionary: dictionary, context: self.sharedContext)
-                                    //Set the location info for the photo, which should populate the phots array in Pin?
+                                    //Set the location info for the photo, which should populate the phots array in Pin
                                     photo.location = pin
                                     dispatch_async(dispatch_get_main_queue()) {
                                         CoreDataStackManager.sharedInstance().saveContext()
@@ -139,7 +140,6 @@ class VTClient: NSObject {
                                     //skip it
                                     continue
                                 }
-                                //println("Photo URLs processed: \(self.photoList.count)")
                             }
                             //return success
                             //println("Leaving getFlickrData")
@@ -160,7 +160,7 @@ class VTClient: NSObject {
     
     //***************************************************
     // Get an image from the URL
-    func taskForImage(filePath:String, completionHandler :(imageDate:NSData?, error:NSError?) -> Void)-> NSURLSessionTask {
+    func taskForImage(filePath:String, completionHandler :(imageData:NSData?, error:NSError?) -> Void)-> NSURLSessionTask {
         
         //Create the request
         let url = NSURL(string: filePath)!
@@ -171,15 +171,14 @@ class VTClient: NSObject {
             data, response, downloadError in
             
             if let error = downloadError {
-                 completionHandler(imageDate: data, error: error)
+                 completionHandler(imageData: nil, error: error)
             } else {
-                completionHandler(imageDate: data, error: nil)
+                completionHandler(imageData: data, error: nil)
             }
         }
         task.resume()
         return task
-        
-    }
+    }//taskForImage
 
     
     //***************************************************
@@ -219,7 +218,7 @@ class VTClient: NSObject {
         let alertAction = UIAlertAction(title: action, style: UIAlertActionStyle.Default, handler: nil)
         alertController.addAction(alertAction)
         viewController.presentViewController(alertController, animated: true, completion: nil)
-    }
+    }//errDialog
     
     //***************************************************
     // Get a pin object based on a set of coordinates
@@ -230,12 +229,24 @@ class VTClient: NSObject {
             $0.latitude == annotation.coordinate.latitude &&
                 $0.longitude == annotation.coordinate.longitude
         }
+        //Shouldn't happen, but if there is more than one pin returned, take the last one
         if filteredPins.count > 0 {
             return filteredPins.last!
         }
         return nil
-    }
-
-
+    }//getMapLocationFromAnnotation
+    
+    //***************************************************
+    // Extract the passed pin from the array and return the 
+    // remaining values
+    func removePinFromAnnotations(pin: Pin, annotations: [Pin]) -> [Pin]{
+        //filter the array and return an array without matching element
+        let ann_array = annotations.filter{
+            $0.latitude != pin.latitude &&
+                $0.longitude != pin.longitude
+        }
+        //return the result
+        return ann_array
+    }//removePins
     
 }//VTClient
