@@ -71,7 +71,7 @@ class CoreDataStackManager{
             dict[NSLocalizedDescriptionKey] = "Failed to initialize the application's saved data"
             dict[NSLocalizedFailureReasonErrorKey] = failureReason
             dict[NSUnderlyingErrorKey] = error
-            error = NSError(domain: "YOUR_ERROR_DOMAIN", code: 9999, userInfo: dict)
+            error = NSError(domain: "com.infiniteloop-slc.ErrorDomain", code: 9999, userInfo: dict)
             // abort() causes the application to generate a crash log and terminate. 
             // Retained for development - REMOVE FOR SHIPPING APPS!!!
             NSLog("Unresolved error \(error), \(error!.userInfo)")

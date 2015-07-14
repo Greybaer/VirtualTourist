@@ -42,6 +42,12 @@ class Photo : NSManagedObject{
         loaded = false
     }//init
     
+    // Delete the file from the documents directory when necessary - DUH!
+    override func prepareForDeletion() {
+        super.prepareForDeletion()
+        self.image = nil
+    }
+    
     var image: UIImage? {
         get {
             return VTClient.Cache.imageCache.imageWithIdentifier(id)

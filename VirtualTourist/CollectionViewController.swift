@@ -268,15 +268,19 @@ class CollectionViewController: UIViewController, UICollectionViewDataSource, UI
     func deleteSelected(){
         var photosToDelete = [Photo]()
         
+        //fetch the info for the photos we need to delete
         for indexPath in selectedIndexes {
             photosToDelete.append(fetchedResultsController.objectAtIndexPath(indexPath) as! Photo)
         }
+        //then iterate through and delete them
         for photo in photosToDelete {
             sharedContext.deleteObject(photo)
         }
+        //save the context
         dispatch_async(dispatch_get_main_queue()) {
             CoreDataStackManager.sharedInstance().saveContext()
         }
+        //and reset the index
         selectedIndexes = [NSIndexPath]()
         configureToolbar()
     }//deleteSelected
@@ -294,17 +298,18 @@ class CollectionViewController: UIViewController, UICollectionViewDataSource, UI
         //dispatch_async(dispatch_get_main_queue()) {
         //    CoreDataStackManager.sharedInstance().saveContext()
         //}
-        
-        //If we're here, the user has loaded at least one collection. Increment to get next page
-        annotation.page++
+
         //Check to see if we're out of pages to load
-        if annotation.page > annotation.lastPage{
+        if annotation.page >= annotation.lastPage{
             //Re-set the page
             annotation.page = 1
+        }else{
+            //Nope, just increment the page
+            annotation.page++
         }
 
         //Now got get a new collection
-        println("Pin page is \(annotation.page) in newCollection()")
+        //println("Pin page is \(annotation.page) in newCollection()")
         VTClient.sharedInstance().getFlickrData(annotation){(success, errorString) in
             if !success{
                 VTClient.sharedInstance().errorDialog(self, errTitle: "Unable to Obtain Photo Data", action: "OK", errMsg: errorString!)
@@ -315,7 +320,7 @@ class CollectionViewController: UIViewController, UICollectionViewDataSource, UI
             CoreDataStackManager.sharedInstance().saveContext()
         }
         configureToolbar()
-        println("Pin values exiting newCollection: \(annotation.latitude)|\(annotation.longitude)|\(annotation.page)|\(annotation.lastPage)")
+        //println("Pin values exiting newCollection: \(annotation.latitude)|\(annotation.longitude)|\(annotation.page)|\(annotation.lastPage)")
     }//loadnewCollection
     
     //***************************************************

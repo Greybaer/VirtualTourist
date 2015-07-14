@@ -105,7 +105,7 @@ class VTClient: NSObject {
                     //Drop the value into the pin object
                     //println("Pin values in FlickrData: \(pin.latitude)|\(pin.longitude)|\(pin.page)|\(pin.lastPage)")
                     pin.lastPage = pages
-                    println("There are \(pin.lastPage) pages of images for this location")
+                    //println("There are \(pin.lastPage) pages of images for this location")
                     //and save the context
                     dispatch_async(dispatch_get_main_queue()) {
                         CoreDataStackManager.sharedInstance().saveContext()
